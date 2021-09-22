@@ -32,11 +32,11 @@ variable "cloudwatch_group" {
 }
 
 variable "ecr_image_tag" {
-  default = "dummy"
+  default = "latest"
 }
 
 variable "ecr_repo" {
-  default = "docker_images"
+  default = "docker_images/dummy"
 }
 
 variable "ingress_rules" {

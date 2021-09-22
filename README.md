@@ -40,7 +40,8 @@ Security groups, target groups, IAM policies, VPC and so on, are already provide
   <img src="./images/secrets.png" alt="Secrets" />
   <br/><br/>
 
-  2. ECR variables must be modified in the [Github Action](https://github.com/seavba/fargate-dummy/blob/main/.github/workflows/main.yml#L7-L10)
+  2. ECR variables must be modified and have the same value in [variables.tf](https://github.com/seavba/fargate-dummy/blob/master/variables.tf) and in [Github Action](https://github.com/seavba/fargate-dummy/blob/main/.github/workflows/main.yml#L7-L10)
+  
     - aws-region: eu-west-1
     - image_tag: dummy
     - ecr_repo: docker_images

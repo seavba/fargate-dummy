@@ -10,12 +10,6 @@ name: "workflow"
   pull_request:
     branches:
       - main
-env:
-  aws-region: eu-west-1
-  image_tag: dummy
-  ecr_repo: docker_images
-  aws_ecs_service: dummy_service
-  aws_ecs_cluster: dummy_ecs_cluster
 
 jobs:
   ci:
@@ -34,16 +28,26 @@ jobs:
       - name: "Checkout Code"
         uses: "actions/checkout@v2"
 
-      - name: Set tag
+      - name: Get repo name
         id: vars
-        run: echo "::set-output name=tag::${GITHUB_REF#refs/*/}"
+        run: |
+          ecr_repo=$(grep -A1 ecr_repo ../../iac/variables.tf | tail -n 1 | awk -F '"' '{print $2}')
+          echo "::set-output name=ecr_repo::$ecr_repo"
+          image_tag=$(grep -A1 image_tag ../../iac/variables.tf | tail -n 1 | awk -F '"' '{print $2}')
+          echo "::set-output name=image_tag::$image_tag"
+          service=$(grep -A1 aws_ecs_service ../../iac/ecs.tf | tail -n 1 | awk -F '"' '{print $2}')
+          echo "::set-output name=service::$service"
+          cluster=$(grep -A1 'resource "aws_ecs_cluster"' ../../iac/ecs.tf | tail -n 1  | awk -F '"' '{print $2}')
+          echo "::set-output name=cluster::$cluster"
+          aws_region=$(grep -A1 aws_region ../../iac/variables.tf | tail -n 1 | awk -F '"' '{print $2}')
+          echo "::set-output name=region::$region"
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.aws-region }}
+          aws-region: ${{ step.vars.region }}
 
       - name: Login to Amazon ECR
         id: login-ecr
@@ -53,13 +57,13 @@ jobs:
         id: build-image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY:  ${{ env.ecr_repo }}
-          IMAGE_TAG: ${{ env.image_tag }}
+          ECR_REPOSITORY:  ${{ steps.vars.ecr_repo }}
+          IMAGE_TAG: ${{ steps.vars.image_tag }}
         run: |
           # Build a docker container and push it to ECR.
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY/$IMAGE_TAG:latest"
+          echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
 
       - name: Download task definition
         run: |
@@ -77,6 +81,6 @@ jobs:
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
-          service: ${{ env.aws_ecs_service }}
-          cluster: ${{ env.aws_ecs_cluster }}
+          service: ${{ steps.vars.service }}
+          cluster: ${{ steps.vars.cluster }}
           wait-for-service-stability: true

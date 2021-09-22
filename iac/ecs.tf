@@ -39,6 +39,7 @@ resource "aws_ecs_task_definition" "dummy_ecs_task" {
   memory                   = 1024         # Specifying the memory our container requires
   cpu                      = 256         # Specifying the CPU our container requires
   execution_role_arn       = aws_iam_role.ecsTaskExecutionRole.arn
+  depends_on = [null_resource.docker]
 }
 
 resource "aws_ecs_service" "dummy_service" {
@@ -71,4 +72,5 @@ resource "aws_ecs_service" "dummy_service" {
     capacity_provider = "FARGATE"
     weight            = 100
   }
+  depends_on = [null_resource.docker]
 }
