@@ -31,8 +31,9 @@ jobs:
       - name: Get repo name
         id: vars
         run: |
-          echo "::set-output name=ecr_repo::$(grep -A1 ecr_repo ./iac/variables.tf | tail -n 1 | awk -F '\"' '{print $2}')"
+          echo "ecr_repo=$(grep -A1 ecr_repo ./iac/variables.tf | tail -n 1 | awk -F '\"' '{print $2}')"
           echo "::set-output name=ecr_repo::$ecr_repo"
+
 
 
       - name: Configure AWS credentials
