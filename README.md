@@ -26,29 +26,21 @@ Security groups, target groups, IAM policies, VPC and so on, are already provide
 
 - <b>Dockerfile:</b> Dockerfile for creating NGINX image
 
-- <b>.github/workflows/main.yml:</b> Github action for building and pushing hte Docker image to the ECR registry. If ECR registry doesn't exist yet, the Github action will do.
+- <b>[.github/workflows/aws.yml](https://github.com/seavba/fargate-dummy/blob/master/.github/workflows/aws.yml):</b> Github action for building, pushing and deploy a new image docker and its containters.
 <br/>
+
+## CI / code
+
+This repo contains a github action triggered by every pushing or merging done in the master branch. The github actions steps are:
+
+- Build the docker image
+- Push the docker image
+- Update task definition
+- Deploy the new containers using the rolling deployment strategy.
 
 ## Getting Started
 
 #### Pre-requisites
-> :warning: Create ECR image (if you didn't do it before)
-
-- Github pre-requisites:
-
-  1. Fork or clone the repo in your Github account. Then, add AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY secrets in your repo.
-  <img src="./images/secrets.png" alt="Secrets" />
-  <br/><br/>
-
-  2. ECR variables must be modified and have the same value in [variables.tf](https://github.com/seavba/fargate-dummy/blob/master/variables.tf) and in [Github Action](https://github.com/seavba/fargate-dummy/blob/main/.github/workflows/main.yml#L7-L10)
-  
-    - aws-region: eu-west-1
-    - image_tag: dummy
-    - ecr_repo: docker_images
-    - aws_ecs_service: dummy_service
-    - aws_ecs_cluster: dummy_ecs_cluster <br/>
-
-  2. Commit and push the step 1 (above) changes to the repo and a Github action will build and push a new Docker image in the ECR registry. If ECR registry doesn't exist yet, the Github action will do.
 
 - AWS CLI must be already configured. If not, try [Configuration and credential file settings](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html)
 
@@ -62,16 +54,17 @@ Once Dummy docker image has been created, for providing such infrastructure, it'
 ```
 cd /your/repo/path
 git clone  git@github.com:seavba/fargate-dummy.git
-cd fargate-dummy/iac && terraform init && terraform apply
+cd fargate-dummy/iac && terraform init && terraform apply -auto-approve
 ```
-```terraform apply`` command asks for confirmation, write ```yes``` if you want to proceed with the deployment.
 
 
 #### Variables
 All the variables to be customised (if needed) can be found in [variables.tf](https://github.com/seavba/fargate-dummy/blob/master/variables.tf) file.
 
+> :warning: Important to change domain_name and zone_name variables, otherwise the deployment will fail.
 
-- ###### Output Variables
+
+###### Output Variables
 After deployment, as output variables are shown:
 ```
 Outputs:
@@ -84,9 +77,8 @@ url = "Enjoy you dummy box https://dummybis.ssans.es"
 
 ```
 cd /your/repo/path
-cd fargate-dummy/iac && terraform destroy
+cd fargate-dummy/iac && terraform destroy -auto-approve
 ```
-```terraform destroy``` command asks for confirmation, write ```yes``` if you want to proceed with the deployment revert.
 
 
 ## Demo
