@@ -31,7 +31,7 @@ jobs:
       - name: Get repo name
         id: vars
         run: |
-          echo "ecr_repo=$(grep -A1 ecr_repo ./iac/variables.tf | tail -n 1 | awk -F '\"' '{print $2}')" >> $ecr_repo
+          echo "ecr_repo=$(grep -A1 ecr_repo ./iac/variables.tf | tail -n 1 | awk -F '\"' '{print $2}')"
           echo "::set-output name=ecr_repo::$ecr_repo"
           echo "image_tag=$(grep -A1 image_tag ./iac/variables.tf | tail -n 1 | awk -F '\"' '{print $2}')"
           echo "::set-output name=image_tag::$image_tag"
@@ -39,7 +39,7 @@ jobs:
           echo "::set-output name=service::$service"
           echo "cluster=$(grep -A1 'resource "aws_ecs_cluster"' ./iac/ecs.tf | tail -n 1  | awk -F '\"' '{print $2}')"
           echo "::set-output name=cluster::$cluster"
-          echo "region=$(grep -A1 aws_region ./iac/variables.tf | tail -n 1 | awk -F '\"' '{print $2}')" >> $region
+          echo "region=$(grep -A1 aws_region ./iac/variables.tf | tail -n 1 | awk -F '\"' '{print $2}')" >> $env_region
           echo "::set-output name=region::$region"
 
       - name: Configure AWS credentials
@@ -47,7 +47,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.region }}
+          aws-region: ${{ env.env_region }}
 
       - name: Login to Amazon ECR
         id: login-ecr
