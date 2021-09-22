@@ -47,7 +47,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ steps.vars.region }}
+          aws-region: ${{ steps.vars.outputs.region }}
 
       - name: Login to Amazon ECR
         id: login-ecr
@@ -57,8 +57,8 @@ jobs:
         id: build-image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY:  ${{ steps.vars.ecr_repo }}
-          IMAGE_TAG: ${{ steps.vars.image_tag }}
+          ECR_REPOSITORY:  ${{ steps.vars.outputs.ecr_repo }}
+          IMAGE_TAG: ${{ steps.vars.outputs.image_tag }}
         run: |
           # Build a docker container and push it to ECR.
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
@@ -81,6 +81,6 @@ jobs:
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
-          service: ${{ steps.vars.service }}
-          cluster: ${{ steps.vars.cluster }}
+          service: ${{ steps.vars.outputs.service }}
+          cluster: ${{ steps.vars.outputs.cluster }}
           wait-for-service-stability: true
