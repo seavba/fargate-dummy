@@ -46,7 +46,7 @@ resource "aws_ecs_service" "dummy_service" {
   name                              = "dummy_service"                             # Naming our first service
   cluster                           = aws_ecs_cluster.dummy_ecs_cluster.id            # Referencing our created Cluster
   task_definition                   = aws_ecs_task_definition.dummy_ecs_task.arn # Referencing the task our service will spin up
-#  launch_type                       = "FARGATE"
+  launch_type                       = "FARGATE"
   desired_count                     = var.num_containers # Setting the number of containers we want deployed to X
   health_check_grace_period_seconds = 300
   deployment_minimum_healthy_percent = 50
@@ -65,12 +65,6 @@ resource "aws_ecs_service" "dummy_service" {
 
   deployment_controller {
     type = "ECS"
-  }
-
-  capacity_provider_strategy {
-    base              = 0
-    capacity_provider = "FARGATE"
-    weight            = 100
   }
   depends_on = [null_resource.docker]
 }

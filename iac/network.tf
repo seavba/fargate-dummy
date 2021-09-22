@@ -29,6 +29,7 @@ resource "aws_lb_target_group" "dummyTG" {
   protocol    = "HTTP"
   target_type = "ip"
   vpc_id      = "${aws_vpc.dummy_vpc.id}"
+  deregistration_delay = 30
   depends_on = [aws_alb.dummy_load_balancer]
 }
 
