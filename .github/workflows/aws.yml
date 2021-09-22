@@ -33,8 +33,14 @@ jobs:
         run: |
           echo "ecr_repo=$(grep -A1 ecr_repo ./iac/variables.tf | tail -n 1 | awk -F '\"' '{print $2}')"
           echo "::set-output name=ecr_repo::$ecr_repo"
-
-
+          echo "image_tag=$(grep -A1 image_tag ./iac/variables.tf | tail -n 1 | awk -F '\"' '{print $2}')"
+          echo "::set-output name=image_tag::$image_tag"
+          echo "service=$(grep -A1 aws_ecs_service ./iac/ecs.tf | tail -n 1 | awk -F '\"' '{print $2}')"
+          echo "::set-output name=service::$service"
+          echo "cluster=$(grep -A1 'resource "aws_ecs_cluster"' ./iac/ecs.tf | tail -n 1  | awk -F '\"' '{print $2}')"
+          echo "::set-output name=cluster::$cluster"
+          echo "region=$(grep -A1 aws_region ./iac/variables.tf | tail -n 1 | awk -F '\"' '{print $2}')"
+          echo "::set-output name=region::$region"
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
