@@ -31,7 +31,7 @@ jobs:
       - name: Get repo name
         id: vars
         run: |
-          grep -A1 ecr_repo ./iac/variables.tf \| tail -n 1
+          grep -A1 ecr_repo ./iac/variables.tf | tail -n 1 
           echo "::set-output name=ecr_repo::$ecr_repo"
 
 
