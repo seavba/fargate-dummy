@@ -31,6 +31,7 @@ jobs:
       - name: Get repo name
         id: vars
         run: |
+          pwd
           ecr_repo=$(grep -A1 ecr_repo ../../iac/variables.tf | tail -n 1 | awk -F '"' '{print $2}')
           echo "::set-output name=ecr_repo::$ecr_repo"
           image_tag=$(grep -A1 image_tag ../../iac/variables.tf | tail -n 1 | awk -F '"' '{print $2}')
@@ -39,7 +40,7 @@ jobs:
           echo "::set-output name=service::$service"
           cluster=$(grep -A1 'resource "aws_ecs_cluster"' ../../iac/ecs.tf | tail -n 1  | awk -F '"' '{print $2}')
           echo "::set-output name=cluster::$cluster"
-          aws_region=$(grep -A1 aws_region ../../iac/variables.tf | tail -n 1 | awk -F '"' '{print $2}')
+          region=$(grep -A1 aws_region ../../iac/variables.tf | tail -n 1 | awk -F '"' '{print $2}')
           echo "::set-output name=region::$region"
 
       - name: Configure AWS credentials
